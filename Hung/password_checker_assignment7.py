@@ -88,7 +88,8 @@ def validate_name(name_input: str) -> bool:
     is_valid: bool = False
     if len(name_input) < 1 or len(name_input) > 50:
         print("Error: Name must be 1-50 characters.")
-    elif not re.match(r'^[a-zA-Z\s\-]+$', name_input):
+    elif not re.match(r'^[a-zA-Z\s\-]+$', name_input): 
+        # Edge Case: What if the name has a space before or after the name, maybe use strip 
         print("Error: Name can only have letters, spaces, hyphens.")
     else:
         is_valid = True
@@ -106,7 +107,9 @@ def validate_email(email_input: str) -> bool:
     '''
     is_valid: bool = False
     pattern: str = r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$'
-    if re.match(pattern, email_input):
+    if re.match(pattern, email_input): 
+        # Security: Validate Email doesn't check for length of the email
+        # Edge Case: What if they enter email@test..com
         is_valid = True
     else:
         print("Error: Invalid email format.")
@@ -124,6 +127,7 @@ def validate_dob(dob_input: str) -> bool:
     '''
     is_valid: bool = False
     match = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', dob_input)
+    # Could also do a length check before matching since it should have a length of 8-10
     if not match:
         print("Error: Please use MM/DD/YYYY format.")
     else:
@@ -132,6 +136,7 @@ def validate_dob(dob_input: str) -> bool:
         year: int = int(match.group(3))
         # range check each value
         if 1 <= month <= 12 and 1 <= day <= 31 and 1900 <= year <= 2026:
+            # Edge Case: Includes invalid dates like February 31st
             is_valid = True
         else:
             print("Error: Invalid date range.")
@@ -150,6 +155,7 @@ def has_personal_info(password: str, user: UserInfo) -> bool:
     items: list = user.get_personal_items()
     for item in items:
         if len(item) >= 2 and item in password_lower:
+            # Security: Maybe check that they didn't put month/day in the password as well
             return True
     return False
 
@@ -172,6 +178,7 @@ def _check_nist(password: str) -> int:
         score += 1
         print("  [PASS] Length >= 12 [NIST]")
     if password.lower() in COMMON_PASSWORDS:
+        # I believe this should be looping through common_passwords to check if they're in password.lower()
         score -= 2
         print("  [FAIL] Common password [NIST]")
     else:
@@ -239,7 +246,7 @@ def get_valid_name(prompt: str) -> str:
     user_input: str = ""
     while not is_valid:
         user_input = input(prompt)
-        if validate_name(user_input):
+        if validate_name(user_input): 
             is_valid = True
     return user_input
 
@@ -292,6 +299,7 @@ def get_password() -> str:
         user_input = input("Enter a password to check: ")
         if len(user_input) < MIN_PASSWORD_LENGTH:
             print(f"Error: Need at least {MIN_PASSWORD_LENGTH} characters.")
+            # Security: Code doesn't check for maximum length
         else:
             is_valid = True
     return user_input
